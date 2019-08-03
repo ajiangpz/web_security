@@ -15,8 +15,10 @@
   },
   "devDependencies": {
     "cookie": "^0.4.0",
+    "helmet": "^3.20.0",
     "htmlencode": "^0.0.4",
     "koa-body": "^4.1.0",
+    "koa-helmet": "^4.2.0",
     "url": "^0.11.0"
   }
 }

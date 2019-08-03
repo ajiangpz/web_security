@@ -2,29 +2,37 @@ const Koa = require("koa");
 const app = new Koa();
 const fs = require("fs");
 const Url = require("url");
-const htmlencode=require("htmlencode");
-const cookie=require('cookie'); 
+const htmlencode = require("htmlencode");
+const cookie = require('cookie');
+const helmet = require('koa-helmet');
 //解析post请求参数中间件
 const koaBody = require("koa-body");
 app.use(koaBody());
+app.use(helmet({
+  frameguard: {
+    action: 'deny'
+  }
+}))
 app.use(async ctx => {
   if (ctx.path === "/") {
     ctx.response.type = "html";
+    console.log(ctx.response.header)
     //主页(表单)
     ctx.response.body = fs.createReadStream("./index.html");
   } else if (ctx.method === "GET" && ctx.path === "/user") {
     var url = Url.parse(ctx.url, true);
     ctx.set("x-xss-protection", 0);
-      var user=htmlencode.htmlEncode(url.query.user);
-    ctx.set('Set-Cookie',cookie.serialize('name',String(user),{
-      httpOnly:true,
-      maxAge:60*60*24*7
+    var user = htmlencode.htmlEncode(url.query.user);
+
+    ctx.set('Set-Cookie', cookie.serialize('name', String(user), {
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7
     }))
     // var user=url.query.user;
     ctx.response.body = `
             <h1>你好，${user}</h1>
         `;
-    
+
   } else if (ctx.method === "POST" && ctx.path === "/form") {
     //获取请求体参数
     const body = ctx.request.body;
