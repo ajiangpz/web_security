@@ -3,6 +3,7 @@ const app = new Koa();
 const fs = require("fs");
 const Url = require("url");
 const htmlencode=require("htmlencode");
+const cookie=require('cookie'); 
 //解析post请求参数中间件
 const koaBody = require("koa-body");
 app.use(koaBody());
@@ -14,11 +15,16 @@ app.use(async ctx => {
   } else if (ctx.method === "GET" && ctx.path === "/user") {
     var url = Url.parse(ctx.url, true);
     ctx.set("x-xss-protection", 0);
-    var user=htmlencode.htmlEncode(url.query.user);
+      var user=htmlencode.htmlEncode(url.query.user);
+    ctx.set('Set-Cookie',cookie.serialize('name',String(user),{
+      httpOnly:true,
+      maxAge:60*60*24*7
+    }))
     // var user=url.query.user;
     ctx.response.body = `
             <h1>你好，${user}</h1>
         `;
+    
   } else if (ctx.method === "POST" && ctx.path === "/form") {
     //获取请求体参数
     const body = ctx.request.body;

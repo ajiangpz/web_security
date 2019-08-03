@@ -65,7 +65,59 @@ XSS攻击成功后，攻击者对用户当前页面植入恶意脚本。用以�
 
 ### XSS防御  
 - HttpOnly  
-在服务端给浏览器设置cookie，如果cookie中存在关键信息，应该给cookie设置httpOnly属性，使攻击者无法通过JavaScript获取cookie信息
+在服务端给浏览器设置cookie，如果cookie中存在关键信息，应该给cookie设置httpOnly属性，使攻击者无法通过JavaScript获取cookie信息,如以下代码：
+    ```
+    ctx.set('Set-Cookie',cookie.serialize('name',String(user),{
+        httpOnly:true,
+        maxAge:60*60*24*7
+    }))
+    ```
+- 输入检查
+1. 格式检查，如用户名只能是数字、字母的组合，手机，身份证等输入格式进行规范，可以让一些基于特殊字符的XSS攻击生效。
+2. 输入检查一般是检查用户输入的数据中是否包含一些特殊字符。如<，>，'，"等。如果存在，则将这些字符进行过滤或者编码。
+3. 输入检查逻辑必须放在服务端实现，客户端的输入检查可以阻挡大部分用户的误操作，节约服务器资源，但是很容易被攻击者绕过。
+4. 输入检查的缺陷  
+    - 在输入的地方对数据做了统一的改变，输入在html和JavaScript可能会存在差异
+    - 可能会改变用户的语义，如1+1<3
+    - 一般输入检查在提交
+    - 输入检查时没有结合渲染页面的html代码，对语境的理解并不完整，可能漏报。如url一般是合法的用户数据，但是如果这个url是恶意脚本所在的url地址，就可以实施xss攻击了。
+- 输出检查
+1. 在HTML标签或者属性中输出 
+    ```
+    <div>$var</div>
+    ```
+    XSS在这种情况下一般是构造一个script标签，或者任何能产生脚本的方式。如：
 
-
-
+    ```
+    <div><script>alert(/xss/)</script></div>
+    ```
+    防御方法：对变量进行htmlencode,如：
+    ```
+    var user=htmlencode.htmlEncode(url.query.user);
+    ctx.response.body = `
+        <h1>你好，${user}</h1>
+    `
+    //编码后就不会出现XSS攻击了
+    ```
+2. 在script标签或者事件中输出，应该确保变量在引号中，攻击者需要先闭合引号才能实    施XSS攻击，如：
+    ```
+    <script>var x="$var"</script>
+    ```
+    ```
+    <script>var x="";alert(/xss/);//"</script>
+    ```
+    防御时使用JavaScriptEncode
+3. 在CSS中输出  
+尽可能禁止用户可控制的变量在"style标签"，“HTML标签中的sylte属性”以及“CSS文件”中输出
+4. 在地址中输出
+如果变量是在URL的path或者search中输出，可以使用URLEncode进行编码。如果变量是整个URL，URL中的protocal和Host是不能进行URLEncode的，因为其中有//，会改变语义，用户数据也有可能是伪协议。一般来说，是检查变量是否以http开头，如果不是则手动添加，以保证不会出现伪协议类的XSS攻击
+- 防御DOM Based XSS
+这种XSS攻击方式不同于前面的方式，这种方式XSS代码是通过JavaScript输出到页面里，而前面的方式都是服务端直接输出到HTML页面。如
+```
+<script>
+    var x="$var";
+    document.write("<a href='"+x+"'>test</a>");
+</script>
+```
+如果按照前面的方法对变量进行javascriptEncode，浏览器执行script代码时，首先会将$var解码，然后再通过document.write写入a标签属性，造成XSS攻击。
+因而在document.write输出到HTML标签时，应该再次encode，如果是输出到script标签或者事件，则进行JavaScriptEncode，如果是html标签，则进行HtmlEncode。
