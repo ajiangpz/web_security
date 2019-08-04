@@ -190,14 +190,18 @@ XSS 攻击成功后，攻击者对用户当前页面植入恶意脚本。用以�
       如果变量是在 URL 的 path 或者 search 中输出，可以使用 URLEncode 进行编码。如果变量是整个 URL，URL 中的 protocal 和 Host 是不能进行 URLEncode 的，因为其中有//，会改变语义，用户数据也有可能是伪协议。一般来说，是检查变量是否以 http 开头，如果不是则手动添加，以保证不会出现伪协议类的 XSS 攻击
 
 - 防御 DOM Based XSS
+
   - 示例代码
+
     ```
     <script>
       var x="$var";
       document.write("<a href='"+x+"'>test</a>");
     </script>
     ```
-  - 防御方法  
+
+  - 防御方法
+
     如果按照前面的方法对变量进 javascriptEncode，浏览器执行 script 代码时，首先会将\$var 解码，然后再通过 document.write 写入 a 标签属性，造成 XSS 攻击。因而在 document.write 输出到 HTML 标签时，应该再次 encode，如果是输出到 script 标签或者事件，则进行 JavaScriptEncode，如果是 html 标签，则进行 HtmlEncode。
 
 ## CSRF 攻击
