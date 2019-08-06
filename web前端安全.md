@@ -401,7 +401,7 @@ XSS 是针对 HTML 的注入攻击，而 SQL 注入则是针对数据库的注�
 
     攻击者访问登录页面，服务器会发给攻击者一个未认证的sid，保存在url中。攻击者将改url作为陷阱，诱导用户去认证。认证后，攻击者再使用该url访问服务器就可以登录成功了。
 
-    ![Image 会话固定攻击]()
+    ![Image 会话固定攻击](https://raw.githubusercontent.com/ajiangpz/web_security/master/img/fix_session.png)
   
   - 防御方法  
     
