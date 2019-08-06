@@ -381,7 +381,7 @@ XSS 是针对 HTML 的注入攻击，而 SQL 注入则是针对数据库的注�
 
     用户登录完成后，会得到一个已经认证的sid，一般保存在cookie或者url中。攻击者通过xss攻击，网络sniff，以及本地木马读取等手段获取了这个sid，保存在自己的cookie中，这样就能伪装成用户完成登录，从而实现攻击。
 
-  - 防御方法
+  - 防御方法  
     
     - 通过给cookie设置httponly，可以有效地缓解sid被窃取。
     - 尽量不要把sid保存在url中。
@@ -412,4 +412,31 @@ XSS 是针对 HTML 的注入攻击，而 SQL 注入则是针对数据库的注�
     - 在指定时间如（三天）强制销毁Session。
     - 客户端发生变化时，如IP、UserAgent等信息发生变化就可以强制销毁Session。
 
+## web框架安全  
 
+### 模板引擎与XSS攻击
+
+最好的XSS防御方案，是在不同的场景使用不同的编码函数，如果同意使用一种编码如HTML encode，那么很可能被攻击者绕过。而模板引擎默认大多以htmlencode为编码方式，但是我们可以在模板引擎实现自定义的编码函数，应用于不同的场景。
+
+### web框架完整的CSRF防御方案  
+
+防御CSRF攻击，最有效的方式就是用token方式。POST请求本身并不足以对抗CSRF，但是POST请求的使用对于保护
+token有积极的意义。而token的私密性是防御CSRF的基础。
+
+1. 在服务器的Session存储或用户浏览器的Cookie（推荐）中绑定token。
+2. 在form表单中自动填入token字段，比如增加隐藏域。
+3. 在Ajax（POST）请求中自动添加token，需要对Ajax进行封装。
+4. 在服务器对比POST提交参数的token与Session中绑定的token是否一致，以验证CSRF攻击。
+
+### HTTP Headers管理
+
+在web框架中，可以对HTTP头进行全局化的处理，因此一些基于HTTP头的安全方案可以很好的实施。
+
+- 利用HTTP头管理跳转的目的地址，避免攻击者实施钓鱼或者诈骗
+
+  - 如果web框架提供统一的跳转函数，可以在函数中实现一个白名单，指定跳转地址只能在白名单中。
+  - 控制Http的location字段，限制location的值只能是白名单里面的地址。
+
+- 与安全相关的Header，如X-Frame-Options也可以在web框架中统一配置。
+
+- 对所有的Cookie默认添加HttpOnly，不需要此功能的Cookie则单独在配置文件中列出。当业务复杂时，可以保证不会有业务被遗漏。
