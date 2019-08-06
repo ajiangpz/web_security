@@ -246,6 +246,8 @@ XSS 攻击成功后，攻击者对用户当前页面植入恶意脚本。用以�
 
   攻击者使用一个透明的、不可见的 iframe，覆盖在一个页面上，然后诱使诱使用户在该页面进行操作，此时用户在不知情的情况下点击透明的 iframe 页面，通过调整 iframe 页面的位置，可以诱使用户恰好点击在 iframe 页面上的一些功能性按钮上。
 
+  ![Image 点击劫持](https://https://raw.githubusercontent.com/ajiangpz/web_security/master/img/clickJacking.png)
+  
 - 特点
 
   - 需要诱使用户与页面产生交互行为。
