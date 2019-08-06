@@ -386,7 +386,7 @@ XSS 是针对 HTML 的注入攻击，而 SQL 注入则是针对数据库的注�
     - 通过给cookie设置httponly，可以有效地缓解sid被窃取。
     - 尽量不要把sid保存在url中。
 
-- 会话保持攻击  
+- 会话固定攻击  
 
   会话固定攻击（Session Fixation）攻击会强制用户使用攻击者指定的会话 ID，属于被动攻击。
   
@@ -410,6 +410,6 @@ XSS 是针对 HTML 的注入攻击，而 SQL 注入则是针对数据库的注�
   - 防御方法
 
     - 在指定时间如（三天）强制销毁Session。
-    - 客户端发生变化时，如IP、UserAgent等信息发生变化就可以强制销毁Session.
+    - 客户端发生变化时，如IP、UserAgent等信息发生变化就可以强制销毁Session。
 
 
